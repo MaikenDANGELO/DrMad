@@ -1,22 +1,74 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import BankAccountView from "@/views/BankAccountView.vue";
+import ShopView from '@/views/ShopView.vue';
+import ShopHome from '@/views/ShopHome.vue';
+import ShopLoginView from '@/views/ShopLoginView.vue';
+import ShopBuy from '@/views/ShopBuy.vue';
+import ShopPay from '@/views/ShopPay.vue';
+import ShopOrders from '@/views/ShopOrders.vue';
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    redirect: '/shop'
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/bank/account',
+    name: 'bankaccount',
+    component: BankAccountView
+  },
+  {
+    path: "/shop",
+    name: 'shopView',
+    component: ShopView,
+    children: [
+      {
+        path: 'home',
+        components: {
+          shopmain: ShopHome
+        },
+        alias: ''
+      },
+      {
+        path: 'login',
+        components: {
+          shopmain: ShopLoginView
+        }
+      },
+      {
+        path: 'buy',
+        components: {
+          shopmain: ShopBuy
+        }
+      },
+      {
+        path: 'pay/:orderId',
+        components: {
+          shopmain: ShopPay
+        },
+        props: {
+          shopmain: true
+        }
+      },
+      {
+        path: 'pay',
+        components: {
+          shopmain: ShopPay
+        },
+        props: {
+          shopmain: true
+        }
+      },
+      {
+        path: 'orders',
+        components: {
+          shopmain: ShopOrders
+        }
+      }
+    ]
   }
 ]
 
