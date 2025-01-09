@@ -68,7 +68,7 @@ function passOrder(cart, user){
 
   let order = {
     items: [],
-    date: new Date().toUTCString(),
+    date: {"$date": new Date().toUTCString()},
     total: 0,
     status: 'waiting_payment',
     uuid: uuidv4(),

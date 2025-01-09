@@ -7,7 +7,7 @@
                 <span>Articles: </span>
                 <span v-for="item of order.items" :key="item.item.name">{{ item.item.name }} x{{ item.amount }} ({{ item.amount*item.item.price }}€), </span>
                 <br><span>Total: {{ order.total }}€  </span>
-                <br><span>Date d'achat: {{ order.date }}</span>
+                <br><span>Date d'achat: {{ order.date.$date }}</span>
                 <br><span>Status: {{ order.status }}</span>
                 <div v-if="order.status==='waiting_payment'">
                     <button style="margin:1%;" @click="handleCancelOrder(order.uuid)">Annuler la commande</button>

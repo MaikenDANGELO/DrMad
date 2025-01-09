@@ -11,13 +11,13 @@
           <input v-model="nameFilter" id="filtername"><br>
           <label for="stockfilter">En stock: </label>
           <input type="checkbox" v-model="stockFilter" id="stockfilter">
-          <CheckedList :data="filterViruses" :fields="['name', 'price', 'promotion']" :itemCheck="true"
+          <CheckedList :data="filterViruses" :fields="['name', 'price','stock', 'promotion']" :itemCheck="true"
             :item-button="{ show: true, text: 'Ajouter au panier' }" :list-button="{ show: true, text: 'Tout ajouter au panier' }"
             :checked="getCheckedViruses(filterViruses)" @item-button-clicked="handleLineButtonClick"
             @list-button-clicked="handleListButtonClick" :item-amount="true"></CheckedList>
         </div>
         <div v-else>
-          <CheckedList :data="this.viruses" :fields="['name', 'price', 'promotion']" :itemCheck="true"
+          <CheckedList :data="this.viruses" :fields="['name', 'price','stock', 'promotion']" :itemCheck="true"
             :item-button="{ show: true, text: 'Ajouter au panier' }" :list-button="{ show: true, text: 'Tout ajouter au panier' }"
             :checked="getCheckedViruses(this.viruses)" @item-button-clicked="handleLineButtonClick"
             @list-button-clicked="handleListButtonClick" :item-amount="true"></CheckedList>

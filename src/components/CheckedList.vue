@@ -5,10 +5,18 @@
         <span v-if="itemCheck">
           <input v-bind="checked[index]" @change="updateCheckedItems(index)" type="checkbox">
         </span>
-        <span v-for="field in fields" :key="field.id">{{field}}: {{obj[field]}}, </span>
+        <span v-for="field of fields" :key="field.id">
+          <span v-if="field!=='promotion'">{{field}}: {{obj[field]}}, </span>
+          <span v-else-if="(field==='promotion' && obj[field].length > 0)">
+            <br>{{ field }}: 
+            <span v-for="prom of obj[field]" :key="prom._id">
+              {{ prom.discount }}% pour {{ prom.amount }} achetés,
+            </span>
+          </span>
+        </span>
         <div v-if="itemAmount">
           <label :for="'amount'+index">Quantité: </label>
-          <input type="number" :max="obj['stock']" :id="'amount'+index" v-model="amounts[index]">
+          <input type="number" :max="obj['stock']" min="0" :id="'amount'+index" v-model="amounts[index]">
         </div>
         <button v-if="itemButton.show" @click="handleLineButtonClick(index)">{{itemButton.text}}</button><br>
       </li>
