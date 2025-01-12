@@ -1,24 +1,29 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import BankAccountView from "@/views/BankAccountView.vue";
+import BankAccountView from '@/views/BankAccountView.vue';
 import ShopView from '@/views/ShopView.vue';
 import ShopHome from '@/views/ShopHome.vue';
 import ShopLoginView from '@/views/ShopLoginView.vue';
 import ShopBuy from '@/views/ShopBuy.vue';
 import ShopPay from '@/views/ShopPay.vue';
 import ShopOrders from '@/views/ShopOrders.vue';
+import BankView from '@/views/BankView.vue';
+import BankHome from '@/views/BankHome.vue';
+import BankAmount from '@/views/BankAmount.vue';
+import BankOperation from '@/views/BankOperation.vue'
+import MainHome from '@/views/MainHome.vue'
+import BankHistory from '@/views/BankHistory.vue'
+import ShopLogout from '@/views/ShopLogout.vue';
+import BankLogout from '@/views/BankLogout.vue';
+
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    redirect: '/shop'
-  },
-  {
-    path: '/bank/account',
-    name: 'bankaccount',
-    component: BankAccountView
+    // redirect: '/shop',
+    component: MainHome,
   },
   {
     path: "/shop",
@@ -67,9 +72,59 @@ const routes = [
         components: {
           shopmain: ShopOrders
         }
+      },
+      {
+        path: 'logout',
+        components: {
+          shopmain: ShopLogout
+        }
       }
     ]
-  }
+  },
+  {
+    path: '/bank',
+    component: BankView,
+  
+    children: [
+      {
+        path: '',
+        alias: 'home',
+        components: {
+          bankmain:BankHome
+        },
+      },
+      {
+        path: 'amount',
+        components: {
+          bankmain: BankAmount
+        },
+      },
+      {
+        path: 'account',
+        components: {
+          bankmain: BankAccountView
+        }
+      },
+      {
+        path: 'operation',
+        components: {
+          bankmain: BankOperation
+        },
+      },
+      {
+        path: 'history',
+        components: {
+          bankmain: BankHistory,
+        }
+      },
+      {
+        path: 'logout',
+        components: {
+          bankmain: BankLogout,
+        }
+      }
+    ]
+  },
 ]
 
 const router = new VueRouter({

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <NavBar :titles="[{text: 'Acheter', color: 'red'},{text: 'Payer', color: 'blue'},{text: 'Mes Commandes', color: 'blue'},{text: 'Se déconnecter', color: 'green'}]" @menu-clicked="menu_clicked"></NavBar>
+    <NavBar :links="[{label: 'Boutique', to: '/shop'},{label: 'Banque', to: '/bank'}]"></NavBar>
     <router-view></router-view>
   </div>
 

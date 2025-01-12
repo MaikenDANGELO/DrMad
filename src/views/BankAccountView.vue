@@ -1,17 +1,9 @@
 <template>
   <div>
     <h1>Bank Account</h1>
-    <span>Account Number</span><input v-model="accountNumber" @keyup="getIsAccountValid(accountNumber)">
-    <button v-if="isAccountValid" @click="getIsAccountValid(accountNumber),getAccountAmount(accountNumber),getAccountTransactions(accountNumber)">Login</button>
-    <button v-else @click="getIsAccountValid(accountNumber),getAccountAmount(accountNumber),getAccountTransactions(accountNumber)" disabled>Login</button>
-    <button @click="resetAccountNumber()">Reset</button>
-    <p v-if="accountAmount">Solde: {{accountAmount}}€</p>
-    <div v-if="accountTransactions">
-      <h3>Transactions du compte</h3>
-      <ul>
-        <li v-for="(transaction,index) in accountTransactions" :key="index">Montant : {{transaction.amount}}€ le {{formatDate(transaction.date["$date"])}}</li>
-      </ul>
-    </div>
+    <span>Account Number</span><input v-model="accNumber" @keyup="handleAccNumber()">
+    <button v-if="accValid" @click="handleLogin(accNumber)">Login</button>
+    <button v-else disabled>Login</button>
   </div>
 </template>
 
@@ -22,13 +14,13 @@ export default {
   name: 'BankAccountView',
   data: () => ({
     accNumber: '',
+    accValid: false,
   }),
   computed: {
-    ...mapState('bank', ['accountNumber', 'accountAmount', 'accountTransactions', 'isAccountValid']),
-    ...mapState('shop', ['shopUser']),
+    ...mapState('bank', ['account']),
     accountNumber : {
       get () {
-        return this.$store.state.accountNumber;
+        return this.$store.state.bank.account.accountNumber;
       },
       set (value) {
         this.$store.commit('updateAccountNumber', value);
@@ -36,17 +28,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions('bank', ['getAccountAmount', 'getAccountTransactions', 'getIsAccountValid', 'resetAccountNumber']),
-    formatDate(date){
-      return new Date(date).toUTCString()
+    ...mapActions('bank', ['accountLogin', 'getIsAccountValid']),
+    async handleLogin(number){
+      await this.accountLogin(number)
+      this.$router.push('/bank')
     },
-    refuseDisconnectedUsers(){
-      if(!this.shopUser) this.$router.push("/shop/login");
-    },
-
+    async handleAccNumber(){
+      this.accValid = await this.getIsAccountValid(this.accNumber)
+        
+    }
   },
-  mounted(){
-    this.refuseDisconnectedUsers();
-  }
 }
 </script>

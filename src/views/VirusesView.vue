@@ -72,7 +72,7 @@ export default {
     cartItemsAmount: [],
   }),
   mounted(){
-    //this.refuseDisconnectedUsers();
+    this.refuseDisconnectedUsers();
   },
   computed: {
     ...mapState('shop', ['viruses', 'shopUser']),

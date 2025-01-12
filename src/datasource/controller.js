@@ -99,16 +99,23 @@ function passOrder(cart, user){
   return {error: 0, status: 200, data: order.uuid};
 }
 
-function payOrder(user, uuid){
+function payOrder(user, uuid, t_uuid){
   if(user === null) return {error: 1, status: 404, data: 'utilisateur invalide'}
   if(uuid === null) return {error: 1, status: 404, data: 'uuid invalide'}
+  if(t_uuid === null)  return {error: 1, status: 404, data: 'transaction uuid invalide'}
   let shopuser = shopusers.find(e => e._id === user._id);
-
   let order = shopuser.orders.find(e => e.uuid === uuid)
   if(order === null) return {error: 1, status: 404, data: 'commande introuvable'}
-
-  order.status = 'finalized'
-  return {error: 0, status: 200, data: "commande payée et finalisée"}
+  
+  let transaction = transactions.find(t => t._id === t_uuid)
+  if(transaction === null) return {error: 1, status: 404, data: 'transaction introuvable'}
+  if(-parseInt(transaction.amount) === parseInt(order.total)){
+    if(transaction.destination && transaction.destination === "65d721c44399ae9c8321832c"){
+      order.status = 'finalized'
+      return {error: 0, status: 200, data: "commande payée et finalisée"}
+    }
+  }
+  return {error: 0, status: 200, data: "paiement invalide"}
 }
 
 function cancelOrder(user, uuid){
@@ -140,24 +147,11 @@ function getAccountAmount(number){
   return  {error: 1, status: 404, data: 'identifiant non trouvé'}
 }
 
-function getAccountTransactions(number){
+async function getAccountTransactions(number){
   if(number === null) return {error: 1, status: 404, data: 'identifiant incorrect'};
-  const accTransacs = [];
-  let nAccount;
-  for(const account in bankaccounts){
-    if(bankaccounts[account].number === number){
-      nAccount = account;
-      break;
-    }
-  }
-  if(nAccount != null) {
-    let accountID = bankaccounts[nAccount]._id
-    for(const n in transactions){
-      if(transactions[n].account === accountID){
-        accTransacs.push(transactions[n])
-      }
-    }
-  }
+  let acc = bankaccounts.find(a => a.number === number)
+  if(acc === null)  return {error: 1, status: 404, data: 'compte introuvable'};
+  let accTransacs = transactions.filter(a => a.account === acc._id);
   return {error: 0, status: 200, data : accTransacs}
 }
 
@@ -180,6 +174,79 @@ function resetAccountNumber(){
   return {error: 0, status: 200, data: ''};
 }
 
+function getAccount(data) {
+  return bankaccounts.find((a) => a.number === data.number) ?? {error: 1, status: 403, data: 'Numéro de compte invalide'};
+}
+
+function getTransactions(data) {
+  let t;
+  return (t = transactions.filter((transaction) => transaction.account === data.account)).length !== 0 ? t : {error: 1, status: 403, data: 'Aucune transaction pour ce compte'}
+}
+
+function createWithdraw({account, amount}) {
+  amount = parseInt(amount)
+  const acc = bankaccounts.find((a) => a.number === account)
+
+  if (acc) {
+    const id = uuidv4()
+    const newTransaction = {
+      _id: id,
+      account: acc._id,
+      date: {
+        $date: new Date().toISOString(),
+      },
+      amount: -amount,
+      uuid: id,
+    };
+    transactions.push(newTransaction);
+    acc.amount = acc.amount-amount
+
+    return { error: 0, status: 201, data: { uuid: id, amount: amount } }
+  }  else {
+    return { error: 1, status: 404, data: 'id de compte invalide' }
+  }
+}
+
+function createPayment(data) {
+  const account = bankaccounts.find((acc) => acc.number === data.account)
+  const destinationAccount = bankaccounts.find((dacc) => dacc.number === data.destNumber)
+
+  if (account && destinationAccount) {
+    let id = uuidv4()
+    const t1 = {
+      _id: id,
+      account: account._id,
+      date: {
+        $date: new Date().toISOString(),
+      },
+      amount: -data.amount,
+      destination: destinationAccount._id,
+      uuid: id,
+    }
+
+    id = uuidv4()
+    const t2 = {
+      _id: id,
+      account: destinationAccount._id,
+      date: {
+        $date: new Date().toISOString()
+      },
+      amount: data.amount,
+      uuid: id,
+    }
+
+    transactions.push(t1)
+    transactions.push(t2)
+    account.amount -= data.amount
+    destinationAccount.amount += data.amount
+    return { error: 0, status: 201, data: { uuid: t1.uuid, amount: account.amount } };
+  } else if (!account) {
+    return { error: 1, status: 404, data: 'id de compte invalide' };
+  } else {
+    return { error: 1, status: 404, data: 'compte destinataire inexistant' };
+  }
+}
+
 export default{
   shopLogin,
   getAllViruses,
@@ -193,4 +260,8 @@ export default{
   payOrder,
   cancelOrder,
   getUserOrders,
+  getAccount,
+  getTransactions,
+  createWithdraw,
+  createPayment
 }

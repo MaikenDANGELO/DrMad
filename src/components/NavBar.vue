@@ -3,31 +3,25 @@
     <div class="navTitle">
       <h3><router-link to="/">DrMad</router-link></h3>
     </div>
-      <div class="navButtons" v-if="shopUser">
-        <button class="navButton" v-for="(title,index) in titles" :key="title.text" @click="handleClick(index)">{{title.text}}</button>
-      </div>
-      <div class="navButtons" v-else>
-        <button class="navButton" @click="handleClick(99)">Se connecter</button>
-      </div>
+    <div class="navButtons">
+      <button class="navButton" v-for="(link, index) in links" :key="index" @click="goTo(link.to)">
+        <slot name="nav-button" :label="link.label">{{ link.label }}</slot>
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
-import {mapState} from "vuex";
 
 export default {
   name: 'NavBar',
-  props: { titles: Array },
-  computed:{
-    ...mapState('shop',['shopUser']),
-  },
-  methods:{
-    handleClick(index) {
-      this.$emit('menu-clicked', index);
+  props: { links: Array },
+  methods: {
+    goTo(dest) {
+      if(this.$route.path !== dest) this.$router.push(dest);
     }
   }
 }
-
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

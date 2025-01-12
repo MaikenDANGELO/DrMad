@@ -94,14 +94,14 @@ async function passOrder(user, cart){
   return response;
 }
 
-async function payOrderFromLocalSource(user, uuid){
-  return LocalSource.payOrder(user, uuid);
+async function payOrderFromLocalSource(user, uuid, t_uuid){
+  return LocalSource.payOrder(user, uuid, t_uuid);
 }
 
-async function payOrder(user, uuid){
+async function payOrder(user, uuid, t_uuid){
   let response;
   try{
-    response = await payOrderFromLocalSource(user, uuid)
+    response = await payOrderFromLocalSource(user, uuid, t_uuid)
   }catch(error){
     response = {error: 1, status: 500, data: 'erreur, impossible de payer la Ordere'}
   }
